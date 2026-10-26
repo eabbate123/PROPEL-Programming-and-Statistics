@@ -1,0 +1,69 @@
+---
+title: "Week05_Jursch"
+author: "Kierra Jursch"
+---
+
+### Research Question
+What is the relationship between late night social media usage and perceived stress score. 
+
+### Hypotheses 
+H0 = Late night social media usage does not impact perceived stress score. 
+H1 = Late night social media usage does impact perceived stress score. 
+
+### Load database 
+```{r}
+library(tidyverse)
+library(readr)
+SM_use <- read_csv("C:/Users/kierr/Downloads/Social_media_impact_on_life.csv", 
+    col_types = cols(Age = col_number(), 
+        Daily_Usage_Hours = col_number(), 
+        Weekend_Extra_Hours = col_number(), 
+        Sleep_Duration_Hours = col_number(), 
+        Sleep_Quality_Score = col_number(), 
+        Late_Night_Usage = col_character(), 
+        Perceived_Stress_Score = col_number(), 
+        Mental_Health_Index = col_number(), 
+        Academic_Performance_GPA = col_number()))
+
+View(SM_use)
+```
+
+### Normality tests 
+Plots a histogram and runs a Shapiro-Wilk test for late night usage of social media, True or False. 
+```{r}
+# filter databases 
+SM_use_LateNight_True <- SM_use %>%
+  filter(SM_use$Late_Night_Usage == "True")
+
+SM_use_LateNight_False <- SM_use %>%
+  filter(SM_use$Late_Night_Usage == "False")
+
+#plot histograms
+SM_use_LateNight_True_H_Graph <- SM_use_LateNight_True %>%
+  ggplot() +
+    geom_histogram(mapping=aes(x=Perceived_Stress_Score), bins = 40)
+
+SM_use_LateNight_True_H_Graph
+
+SM_use_LateNight_False_H_Graph <- SM_use_LateNight_False %>%
+  ggplot() +
+    geom_histogram(mapping=aes(x=Perceived_Stress_Score), bins = 40)
+
+SM_use_LateNight_False_H_Graph
+
+# shapiri-w tests
+SM_use_True_SW_test <- shapiro.test(SM_use_LateNight_True$Perceived_Stress_Score)
+SM_use_False_SW_test <-shapiro.test(SM_use_LateNight_False$Perceived_Stress_Score)
+
+SM_use_True_SW_test
+SM_use_False_SW_test
+```
+
+### Statistical comparison 
+The data was not normally distributed according to both the histograms and the Shapiro-Wilk test, and I am comparing two groups, so I used a Wilcox test. 
+```{r}
+wilcox.test(Perceived_Stress_Score ~ Late_Night_Usage, data = SM_use)
+```
+
+###Conclusion
+Here I assessed the perceived stress scores among individuals who did or did not report late night usage of social media. I used a Wilcox test as I was comparing two groups and the data was not normally distributed. The Wilcox test reported a p-value of less than .001, rejecting the null hypothesis that perceived stress score does not differ between groups that did and did not use social media late at night. These results indicate that those who use social media late at night have a higher perceived stress score. This conclusion carries the risk of being a type I error, or a false positive. 

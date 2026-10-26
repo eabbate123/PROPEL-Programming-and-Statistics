@@ -1,0 +1,93 @@
+---
+title: "Week04_Jursch"
+author: "Kierra Jursch"
+---
+
+### Import packages and database 
+Import a database on social media usage and assign appropriate column types. 
+
+```{r}
+library(tidyverse)
+library(readr)
+SM_use <- read_csv("C:/Users/kierr/Downloads/Social_media_impact_on_life.csv", 
+    col_types = cols(Age = col_number(), 
+        Daily_Usage_Hours = col_number(), 
+        Weekend_Extra_Hours = col_number(), 
+        Sleep_Duration_Hours = col_number(), 
+        Sleep_Quality_Score = col_number(), 
+        Late_Night_Usage = col_character(), 
+        Perceived_Stress_Score = col_number(), 
+        Mental_Health_Index = col_number(), 
+        Academic_Performance_GPA = col_number()))
+
+View(SM_use)
+
+```
+
+### Describe a categorical variable
+In this study's sample, Instagram was the most reported primary platform followed by TikTok and YouTube, with each platform having over 750 respondents that reported it as their primary social media app. Snapchat, Reddit, Twitter, and LinkedIn each had under 500 respondents report it as their primary platform. Values were similar among different platforms. 
+
+```{r}
+SM_use_platform <- SM_use %>%
+  group_by(Primary_Platform) %>%
+  summarise(Primary_Platform_Count = n())
+
+SM_use_platform
+
+SM_use_platform_graph <- SM_use %>%
+  ggplot() +
+    geom_bar(mapping=aes(x = Primary_Platform))
+
+SM_use_platform_graph
+
+```
+
+### Describe a continuous variable
+Daily social media usage in this dataset has a skewed distribution. Due to this I reported a 5 number summary instead of the mean and standard distribution. Social media usage ranged from 0.9 to 14 hours per day with a median of 4.7 hours. 
+
+```{r}
+SM_use_daily_usage_graph <- SM_use %>%
+  ggplot() +
+    geom_histogram(
+      mapping = aes(x = Daily_Usage_Hours),
+      bins = 30
+    )
+
+SM_use_daily_usage_graph
+
+SM_use_daily_usage_descriptive_stats <- SM_use %>%
+  summarise(
+    min_use = min(Daily_Usage_Hours),
+    q1_use = quantile(Daily_Usage_Hours, probs = 0.25),
+    med_use = median(Daily_Usage_Hours),
+    q2_use = quantile(Daily_Usage_Hours, probs = 0.75),
+    max_use = max(Daily_Usage_Hours)
+  )
+
+SM_use_daily_usage_descriptive_stats_byplatform <- SM_use %>%
+  group_by(Primary_Platform) %>%
+  summarise(
+    min_use = min(Daily_Usage_Hours),
+    q1_use = quantile(Daily_Usage_Hours, probs = 0.25),
+    med_use = median(Daily_Usage_Hours),
+    q2_use = quantile(Daily_Usage_Hours, probs = 0.75),
+    max_use = max(Daily_Usage_Hours)
+  )
+
+SM_use_daily_usage_descriptive_stats
+SM_use_daily_usage_descriptive_stats_byplatform
+
+```
+
+### Relationship between two variables
+In this dataset individuals with higher daily usage hours tended to have a lower mental health index score, which is used to represent worse mental health. I also assigned each data point a color based on the primary platform used. No single platform appears to cluster in any particular region of the graph. 
+
+```{r}
+SM_use_usage_by_MHI_graph <- SM_use %>%
+  ggplot() +
+    geom_point(mapping=aes(x=Daily_Usage_Hours, y=Mental_Health_Index, color=Primary_Platform))
+
+SM_use_usage_by_MHI_graph 
+```
+
+

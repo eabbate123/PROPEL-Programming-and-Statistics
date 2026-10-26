@@ -1,0 +1,65 @@
+---
+title: "Week06_Jursch"
+author: "Kierra Jursch"
+---
+### Load Database
+```{r}
+library(tidyverse)
+library(readr)
+SM_use <- read_csv("Social_media_impact_on_life.csv", 
+    col_types = cols(Age = col_number(), 
+        Daily_Usage_Hours = col_number(), 
+        Weekend_Extra_Hours = col_number(), 
+        Sleep_Duration_Hours = col_number(), 
+        Sleep_Quality_Score = col_number(), 
+        Late_Night_Usage = col_character(), 
+        Perceived_Stress_Score = col_number(), 
+        Mental_Health_Index = col_number(), 
+        Academic_Performance_GPA = col_number()))
+
+View(SM_use)
+```
+
+
+### Task 1: Identify your outcome variable
+Perceived_Stress_Score appears to have a mostly normal distribution. 
+```{r}
+# outcome variable: Perceived_Stress_Score
+
+SM_use_Stress_Histogram <- SM_use %>%
+  ggplot() +
+    geom_histogram(mapping=aes(x=Perceived_Stress_Score), bins = 40, na.rm = TRUE)
+
+SM_use_Stress_Histogram
+
+
+```
+
+
+### Task 2: Fit the model
+I chose to use a linear regression as my variable is continuous, not binary. 
+```{r}
+model <- lm(formula = Perceived_Stress_Score ~ Daily_Usage_Hours + Academic_Performance_GPA, data = SM_use)
+
+summary(model)
+
+```
+
+### Task 3: Interpret your regression coefficients
+#### Outcome: Perceived_Stress_Score
+
+#### Predictor 1: Daily_Usage_Hours
+According to the model, each additional hour of daily usage is associated with a 1.60 point increase in perceived stress, after accounting for academic performance. This relationship is statistically significant (p < .001). 
+
+#### Predictor 2: Academic_Performance_GPA
+According to the model, each 1 point increase in GPA is associated with a 4.19 point decrease in perceived stress, after accounting for daily usage hours. This relationship is statistically significant (p < .001). 
+
+### Task 4: Run one diagnostic check
+I don't see any clear patterns or changes in spread in the residuals vs. fitted plot. The residuals appear approximately normally distributed in the Q-Q plot.
+```{r}
+plot(model, which = 1)
+plot(model, which = 2)
+```
+
+### Summary
+A multiple linear regression model was used to examine whether daily usage hours and academic performance (reported as GPA) were associated with perceived stress scores. Daily usage hours were positively associated with perceived stress, with each additional hour associated with a 1.60 point increase in stress scores, controlling for GPA (p < .001). GPA was negatively associated with perceived stress, with each 1 point increase associated with a 4.19 point decrease in stress scores, controlling for daily usage hours (p < .001). The residuals-versus-fitted plot showed no clear patterns or changes in spread, suggesting that linearity and constant variance assumptions were reasonable. The Q-Q plot also indicated that residuals were approximately normally distributed. Overall, both predictors were significantly associated with perceived stress, although these results do not establish causation.
