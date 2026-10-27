@@ -37,14 +37,16 @@ SM_use %>%
   filter(Late_Night_Usage == "TRUE") %>%
   drop_na(Academic_Performance_GPA) %>%
   ggplot() +
-  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40) +
+                (ggtitle("Late Night Social Media") )
 
 # Histogram: no late-night social media use
 SM_use %>%
   filter(Late_Night_Usage == "FALSE") %>%
   drop_na(Academic_Performance_GPA) %>%
   ggplot() +
-  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40) +
+                (ggtitle("No Late Night Social Media") )
 ```
 ##The distributions of academic performance GPA are skewed and do not appear to be normally distributed. Because academic performance GPA is a continuous variable and we're comparing two independent groups of late night social media usage, we will run a Wilcoxon rank-sum test.
 
