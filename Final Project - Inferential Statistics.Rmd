@@ -1,0 +1,55 @@
+---
+title: "Final Project - Inferential Stats"
+author: "Aiyina Meng"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Null hypothesis: Students who use social media late at night and students who do not use social media late at night have the same academic performance GPA.
+
+# Alternative hypothesis: Students who use social media late at night and students who do not use social media late at night have different academic performance GPAs.
+
+### Load database 
+```{r}
+library(tidyverse)
+library(readr)
+SM_use <- read_csv("Social_media_impact_on_life.csv")
+    col_types = cols(Age = col_number(), 
+        Daily_Usage_Hours = col_number(), 
+        Weekend_Extra_Hours = col_number(), 
+        Sleep_Duration_Hours = col_number(), 
+        Sleep_Quality_Score = col_number(), 
+        Late_Night_Usage = col_character(), 
+        Perceived_Stress_Score = col_number(), 
+        Mental_Health_Index = col_number(), 
+        Academic_Performance_GPA = col_number())
+
+View(SM_use)
+```
+## Normality tests 
+### Plots histograms of academic performance GPAs for students who use social media late at night, and students who do not, to determine normality of the variable of interest.
+```{r}
+SM_use %>%
+  filter(Late_Night_Usage == "TRUE") %>%
+  drop_na(Academic_Performance_GPA) %>%
+  ggplot() +
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+
+# Histogram: no late-night social media use
+SM_use %>%
+  filter(Late_Night_Usage == "FALSE") %>%
+  drop_na(Academic_Performance_GPA) %>%
+  ggplot() +
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+```
+##The distributions of academic performance GPA are skewed and do not appear to be normally distributed. Because academic performance GPA is a continuous variable and we're comparing two independent groups of late night social media usage, we will run a Wilcoxon rank-sum test.
+
+```{r}
+wilcox.test(Academic_Performance_GPA ~ Late_Night_Usage, data = SM_use)
+```
+
+##Here, we analyzed the difference in academic performance GPA between students who use social media late at night, and students who don't. Because the data was not normally distributed, we can a Wilcoxon rank-sum test, which resulted in a p-value less than 2.2 × 10⁻¹⁶. Because the p-value is much smaller than the significance level of 0.001, we reject the null hypothesis. There is statistically significant evidence that academic performance GPA differs between students who use social media late at night and students who do not.
