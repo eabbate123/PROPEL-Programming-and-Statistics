@@ -80,13 +80,11 @@ summary(model_linear)
 
 ### Since, the dependent variable, Academic Performance, is a continuous variable, a linear regression was used. The dependent variable was academic performance and the independent variable for this model is late night social media usage.
 
-### The Coefficient is estimated to be -0.203 for late night usage with a p-value of <2e-16. This means that if a student stays up late using social media, their GPA is expected to be 0.2 points lower on average than a student that does not stay up late using social media. Since the p-value is less than 0.001, this is a statistically difference.
-
 #Model Diagnostics
 ```{r}
 plot(model_linear, which = 2)  
 ```
 
-### A QQ plot was used to check that this model was appropriate for the data. This QQ plot looks at the residual values versus the expected residual values if there was a normal distribution. Since the data fit the QQ line relatively well, we can determine that this linear regression is appropriate for this data set.
+### A QQ plot was used to check that this model was appropriate for the data. This QQ plot looks at the residual values versus the expected residual values if there was a normal distribution. Since the data fit the QQ line relatively well, this means that the residuals follow a relatively normal distribution. This means that a linear regression model is appropriate for this data.
 
-
+### Regression interpretation: The coefficient is estimated to be -0.203 for late night usage with a p-value of <2e-16. This means that if a student stays up late using social media, their GPA is expected to be 0.2 points lower on average than a student that does not stay up late using social media. Since the p-value is less than 0.001, we reject the null hypothesis that there is not a difference of academic performance between students that use social media late at night versus those that do not.
