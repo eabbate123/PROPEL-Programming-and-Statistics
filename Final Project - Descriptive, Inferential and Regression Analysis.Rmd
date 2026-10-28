@@ -1,0 +1,92 @@
+---
+title: "Final Project- Descriptive, Inferential, and Regression Analysis"
+author: "Emma Abbate"
+date: "10272026"
+output: html_document
+---
+
+# Null hypothesis: Students who use social media late at night and students who do not use social media late at night have the same academic performance GPA.
+
+# Alternative hypothesis: Students who use social media late at night and students who do not use social media late at night have different academic performance GPAs.
+
+### Load database 
+```{r}
+library(tidyverse)
+library(readr)
+SM_use <- read_csv("Social_media_impact_on_life.csv")
+    col_types = cols(Age = col_number(), 
+        Daily_Usage_Hours = col_number(), 
+        Weekend_Extra_Hours = col_number(), 
+        Sleep_Duration_Hours = col_number(), 
+        Sleep_Quality_Score = col_number(), 
+        Late_Night_Usage = col_character(), 
+        Perceived_Stress_Score = col_number(), 
+        Mental_Health_Index = col_number(), 
+        Academic_Performance_GPA = col_number())
+
+View(SM_use)
+```
+## Normality tests 
+### Plots histograms of academic performance GPAs for students who use social media late at night, and students who do not, to determine normality of the variable of interest.
+```{r}
+SM_use %>%
+  filter(Late_Night_Usage == "TRUE") %>%
+  drop_na(Academic_Performance_GPA) %>%
+  ggplot() +
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+
+# Histogram: no late-night social media use
+SM_use %>%
+  filter(Late_Night_Usage == "FALSE") %>%
+  drop_na(Academic_Performance_GPA) %>%
+  ggplot() +
+  geom_histogram(aes(x = Academic_Performance_GPA), bins = 40)
+```
+##The distributions of academic performance GPA are skewed and do not appear to be normally distributed. Because academic performance GPA is a continuous variable and we're comparing two independent groups of late night social media usage, we will run a Wilcoxon rank-sum test.
+
+```{r}
+wilcox.test(Academic_Performance_GPA ~ Late_Night_Usage, data = SM_use)
+```
+
+##Here, we analyzed the difference in academic performance GPA between students who use social media late at night, and students who don't. Because the data was not normally distributed, we can a Wilcoxon rank-sum test, which resulted in a p-value less than 2.2 × 10⁻¹⁶. Because the p-value is much smaller than the significance level of 0.001, we reject the null hypothesis. There is statistically significant evidence that academic performance GPA differs between students who use social media late at night and students who do not.
+
+
+#Applying descriptive statistics to analyze academic performance GPA between students who use social media late at night vs students who don't.
+```{r}
+SM_use %>%
+  drop_na(Academic_Performance_GPA, Late_Night_Usage) %>%
+  group_by(Late_Night_Usage) %>%
+  summarize(
+    n = n(),
+    med_Academic_Performance_GPA = median(Academic_Performance_GPA),
+    min_Academic_Performance_GPA = min(Academic_Performance_GPA),
+    max_Academic_Performance_GPA = max(Academic_Performance_GPA),
+    q1_Academic_Performance_GPA = quantile(Academic_Performance_GPA, 0.25),
+    q3_Academic_Performance_GPA = quantile(Academic_Performance_GPA, 0.75)
+   
+  )
+```
+#descriptive statistics interpretation: Students who used late night social media (2591 students) had a median GPA of 3.37, while students who did not use late night social media had a GPA of 3.57. The max GPA for both students who used late night social media and who didn't was a 4 GPA. However, the minimum GPA for students who didn't use late night social media was 1.90, while those who did use late night social media had a minimum GPA of 1.99. The first quartile GPA of students who did not use late night social media was 3.35 while those who did use late night social media Gpa was 3.09. Lastly, the third quartile GPA for students who used late night social media was 3.64, while students who did not use late night social media had a GPA 3.82.
+
+#Regression Analysis to determine on average the association between academic performance and late night social media usage.
+
+#Linear Regression
+```{r}
+SM_df <- SM_use %>% drop_na(Late_Night_Usage,Academic_Performance_GPA)
+
+model_linear <- lm(Academic_Performance_GPA ~ Late_Night_Usage, data = SM_df)
+summary(model_linear)
+```
+
+### Since, the dependent variable, Academic Performance, is a continuous variable, a linear regression was used. The dependent variable was academic performance and the independent variable for this model is late night social media usage.
+
+### The Coefficient is estimated to be -0.203 for late night usage with a p-value of <2e-16. This means that if a student stays up late using social media, their GPA is expected to be 0.2 points lower on average than a student that does not stay up late using social media. Since the p-value is less than 0.001, this is a statistically difference.
+
+#Model Diagnostics
+```{r}
+plot(model_linear, which = 2)  
+```
+
+### A QQ plot was used to check that this model was appropriate for the data. This QQ plot looks at the residual values versus the expected residual values if there was a normal distribution. Since the data fit the QQ line relatively well, we can determine that this linear regression is appropriate for this data set.
+
+
